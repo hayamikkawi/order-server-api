@@ -1,6 +1,6 @@
 const express = require('express')
 const request = require('request')
-
+const log = require('../middleware/log')
 const router = express.Router()
 // check book 
 const checkBooks = (id)=>{
@@ -16,7 +16,6 @@ const checkBooks = (id)=>{
             if(count<=0){
                  return reject("This item is out of stock")
             }
-            console.log('hey')
             return resolve({msg:"available", count})
 
         })
@@ -25,7 +24,7 @@ const checkBooks = (id)=>{
 //buy book
 const buyBook = (id,count)=>{
     return new Promise((resolve, reject)=>{
-        const decUrl = 'http://127.0.0.1:3000/books/count/'+id
+        const decUrl = 'http://127.0.0.1:3000/books/'+id
         request.patch(
             decUrl,
             {json:{numberOfItems: count-1}},
@@ -39,7 +38,7 @@ const buyBook = (id,count)=>{
     }) 
 }
 //purchase a book
-router.get('/books/purchase/:id', async(req, res)=>{
+router.get('/books/purchase/:id', log, async(req, res)=>{
     try{
         const id = req.params.id
         const checked = await checkBooks(id)
